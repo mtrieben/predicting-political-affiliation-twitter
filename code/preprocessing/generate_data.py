@@ -8,7 +8,7 @@ def save_dataset(dataset, path):
     labels = dataset["party"].values
     np.save(os.path.join(path, "labels.npy"), labels)
 
-data = pd.read_pickle("data/tweets.pkl")
+data = pd.read_pickle("data/all_tweets.pkl")
 data = data[pd.notnull(data["full_text"])]
 
 np.random.seed(230)
