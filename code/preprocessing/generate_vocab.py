@@ -57,12 +57,18 @@ if __name__ == "__main__":
     print(training_tweets.shape)
     print(testing_tweets.shape)
 
+    single_uses = set()
+
     for tweet in training_tweets:
         tweet = tokenize(tweet)
         for word in tweet:
             if word not in vocab:
                 vocab[word] = index
                 index += 1
+                single_uses.add(word)
+            else:
+                if word in single_uses:
+                    single_uses.remove(word)
 
     for tweet in testing_tweets:
         tweet = tokenize(tweet)
@@ -70,6 +76,15 @@ if __name__ == "__main__":
             if word not in vocab:
                 vocab[word] = index
                 index += 1
+                single_uses.add(word)
+            else:
+                if word in single_uses:
+                    single_uses.remove(word)
+
+    print(len(vocab))
+
+    for word in single_uses:
+        del vocab[word]
 
     print(len(vocab))
 
