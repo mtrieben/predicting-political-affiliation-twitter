@@ -95,13 +95,13 @@ def prep_data(inputs_train, labels_train, inputs_test, labels_test, vocab):
     inputs_array_train = [x if len(
         x) >= max_len else x + ["<PAD>"]*(max_len - len(x)) for x in inputs_array_train]
     inputs_array_train = [
-        x if x in vocab else "<UNK>" for x in inputs_array_train]
+        [x if x in vocab else "<UNK>"] for x in inputs_array_train]
     inputs_array_train = [[vocab[x] for x in y] for y in inputs_array_train]
 
     inputs_array_test = [x if len(
         x) >= max_len else x + ["<PAD>"]*(max_len - len(x)) for x in inputs_array_test]
     inputs_array_test = [
-        x if x in vocab else "<UNK>" for x in inputs_array_test]
+        [x if x in vocab else "<UNK>"] for x in inputs_array_test]
     inputs_array_test = [[vocab[x] for x in y] for y in inputs_array_test]
 
     return inputs_array_train, inputs_array_test, labels_final_train, labels_final_test, max_len
