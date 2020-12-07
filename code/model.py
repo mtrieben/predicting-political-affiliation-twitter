@@ -56,7 +56,7 @@ def train(model, dataset, max_len):
             count += 1
             if count % 10 == 0:
                 print("count:", count)
-                print("loss", loss.item())
+                # print("loss", loss.item())
 
 
 def test(model, dataset, max_len):

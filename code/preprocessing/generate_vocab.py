@@ -88,6 +88,11 @@ if __name__ == "__main__":
 
     print(len(vocab))
 
+    index = 0
+    for word in vocab:
+        vocab[word] = index
+        index += 1
+
     with open("data/vocab.pkl", 'wb') as f:
         pickle.dump(vocab, f)
 
