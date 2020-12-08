@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from preprocessing.generate_vocab import tokenize
 from torch.utils.data import Dataset
 import gc
+import resource
 
 
 class Net(torch.nn.Module):
@@ -37,7 +38,7 @@ def train(model, dataset, max_len):
         model.parameters(), lr=1e-3, weight_decay=0.0436)
     criterion = torch.nn.BCEWithLogitsLoss()
 
-    for epoch in range(5):
+    for epoch in range(1):
         print("epoch", epoch)
         hidden = torch.zeros(2, max_len, model.hidden_size)
         count = 0
@@ -55,10 +56,11 @@ def train(model, dataset, max_len):
                 loss = Variable(loss, requires_grad=True)
                 loss.backward()
                 optimizer.step()
-            count += 1
-            if count % 10 == 0:
-                print("count:", count)
-        # print("loss", loss.item())
+                count += 1
+                if count % 10 == 0:
+                    print("count:", count)
+                    #     gc.collect()
+                    #     print('maxrss = {}'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6))
 
 
 def test(model, dataset, max_len):
@@ -73,7 +75,9 @@ def test(model, dataset, max_len):
             outputs = torch.squeeze(outputs)
             total += len(inputs)
             correct += (labels == outputs).sum()
-    return correct / total
+    print("total", total)
+    print("correct", correct.item())
+    return correct.item() / total
 
 
 def prep_data(inputs_train, labels_train, inputs_test, labels_test, vocab):
@@ -118,33 +122,23 @@ if __name__ == "__main__":
         "data/train/text.npy", "data/train/labels.npy", "data/test/text.npy", "data/test/labels.npy", vocab)
     glove = torch.Tensor(np.load("data/glove.npy", allow_pickle=True))
     #data = NlpDataset(inputs, labels)
-    inputs_tensor = torch.LongTensor(inputs_train)
-    labels_tensor = torch.Tensor(labels_train)
+    inputs_tensor = torch.LongTensor(inputs_train[:30000])
+    labels_tensor = torch.Tensor(labels_train[:30000])
     data = torch.utils.data.TensorDataset(inputs_tensor, labels_tensor)
     dataset = torch.utils.data.DataLoader(data, batch_size=64, shuffle=True)
-    model = Net(glove, max_len)
-
     inputs_test_tensor = torch.LongTensor(inputs_test)
     labels_test_tensor = torch.Tensor(labels_test)
     testing = torch.utils.data.TensorDataset(
         inputs_test_tensor, labels_test_tensor)
     testing_dataset = torch.utils.data.DataLoader(
         testing, batch_size=64, shuffle=False)
-    print("Testing...")
+    model = Net(glove, max_len)
     accuracy = test(model, testing_dataset, max_len)
-    print("Testing done!")
-    print("accuracy:", accuracy)
-
+    print("accuracy 1:", accuracy)
     print("Training...")
     train(model, dataset, max_len)
     print("Training done!")
-    # inputs_test_tensor = torch.LongTensor(inputs_test)
-    # labels_test_tensor = torch.Tensor(labels_test)
-    # testing = torch.utils.data.TensorDataset(
-    #     inputs_test_tensor, labels_test_tensor)
-    # testing_dataset = torch.utils.data.DataLoader(
-    #     testing, batch_size=64, shuffle=False)
     print("Testing...")
     accuracy = test(model, testing_dataset, max_len)
     print("Testing done!")
-    print("accuracy:", accuracy)
+    print("accuracy 2:", accuracy)
