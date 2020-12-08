@@ -40,7 +40,7 @@ def train(model, dataset, max_len):
         model.parameters(), lr=1e-3, weight_decay=0.0436)
     criterion = torch.nn.BCEWithLogitsLoss()
 
-    for epoch in range(1):
+    for epoch in range(5):
         print("epoch", epoch)
         hidden = torch.zeros(2, max_len, model.hidden_size)
         count = 0
@@ -125,8 +125,8 @@ if __name__ == "__main__":
         "data/train/text.npy", "data/train/labels.npy", "data/test/text.npy", "data/test/labels.npy", vocab)
     glove = torch.Tensor(np.load("data/glove.npy", allow_pickle=True))
     #data = NlpDataset(inputs, labels)
-    inputs_tensor = torch.LongTensor(inputs_train[:30000])
-    labels_tensor = torch.Tensor(labels_train[:30000])
+    inputs_tensor = torch.LongTensor(inputs_train)
+    labels_tensor = torch.Tensor(labels_train)
     data = torch.utils.data.TensorDataset(inputs_tensor, labels_tensor)
     dataset = torch.utils.data.DataLoader(data, batch_size=64, shuffle=True)
     inputs_test_tensor = torch.LongTensor(inputs_test)
