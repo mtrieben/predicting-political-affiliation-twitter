@@ -127,6 +127,8 @@ if __name__ == "__main__":
     #data = NlpDataset(inputs, labels)
     inputs_tensor = torch.LongTensor(inputs_train)
     labels_tensor = torch.Tensor(labels_train)
+    print("inputs_tensor", inputs_tensor.shape)
+    print("labels_tensor", labels_tensor.shape)
     data = torch.utils.data.TensorDataset(inputs_tensor, labels_tensor)
     dataset = torch.utils.data.DataLoader(data, batch_size=64, shuffle=True)
     inputs_test_tensor = torch.LongTensor(inputs_test)
