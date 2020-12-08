@@ -5,6 +5,7 @@ import numpy as np
 from torch.autograd import Variable
 from preprocessing.generate_vocab import tokenize
 from torch.utils.data import Dataset
+import gc
 
 
 class Net(torch.nn.Module):
@@ -41,22 +42,23 @@ def train(model, dataset, max_len):
         hidden = torch.zeros(2, max_len, model.hidden_size)
         count = 0
         for inputs, labels in dataset:
-            optimizer.zero_grad()
-            outputs, hidden = model(inputs, hidden)
+            with torch.no_grad():
+                optimizer.zero_grad()
+                outputs, hidden = model(inputs, hidden)
 
-            labels = (torch.eq(labels, 1.0))*1
-            outputs = (torch.gt(outputs, 0.5))*1
-            outputs = torch.squeeze(outputs)
-            outputs = outputs.type(torch.DoubleTensor)
-            labels = labels.type(torch.DoubleTensor)
-            loss = criterion(outputs, labels)
-            loss = Variable(loss, requires_grad=True)
-            loss.backward()
-            optimizer.step()
+                labels = (torch.eq(labels, 1.0))*1
+                outputs = (torch.gt(outputs, 0.5))*1
+                outputs = torch.squeeze(outputs)
+                outputs = outputs.type(torch.DoubleTensor)
+                labels = labels.type(torch.DoubleTensor)
+                loss = criterion(outputs, labels)
+                loss = Variable(loss, requires_grad=True)
+                loss.backward()
+                optimizer.step()
             count += 1
             if count % 10 == 0:
                 print("count:", count)
-                # print("loss", loss.item())
+        # print("loss", loss.item())
 
 
 def test(model, dataset, max_len):
@@ -64,12 +66,13 @@ def test(model, dataset, max_len):
     correct = 0
     total = 0
     for inputs, labels in dataset:
-        outputs, hidden = model(inputs, hidden)
-        labels = (torch.eq(labels, 1.0))*1
-        outputs = (torch.gt(outputs, 0.5))*1
-        outputs = torch.squeeze(outputs)
-        total += len(inputs)
-        correct += (labels == outputs).sum()
+        with torch.no_grad():
+            outputs, hidden = model(inputs, hidden)
+            labels = (torch.eq(labels, 1.0))*1
+            outputs = (torch.gt(outputs, 0.5))*1
+            outputs = torch.squeeze(outputs)
+            total += len(inputs)
+            correct += (labels == outputs).sum()
     return correct / total
 
 
@@ -120,15 +123,27 @@ if __name__ == "__main__":
     data = torch.utils.data.TensorDataset(inputs_tensor, labels_tensor)
     dataset = torch.utils.data.DataLoader(data, batch_size=64, shuffle=True)
     model = Net(glove, max_len)
-    print("Training...")
-    train(model, dataset, max_len)
-    print("Training done!")
+
     inputs_test_tensor = torch.LongTensor(inputs_test)
     labels_test_tensor = torch.Tensor(labels_test)
     testing = torch.utils.data.TensorDataset(
         inputs_test_tensor, labels_test_tensor)
     testing_dataset = torch.utils.data.DataLoader(
         testing, batch_size=64, shuffle=False)
+    print("Testing...")
+    accuracy = test(model, testing_dataset, max_len)
+    print("Testing done!")
+    print("accuracy:", accuracy)
+
+    print("Training...")
+    train(model, dataset, max_len)
+    print("Training done!")
+    # inputs_test_tensor = torch.LongTensor(inputs_test)
+    # labels_test_tensor = torch.Tensor(labels_test)
+    # testing = torch.utils.data.TensorDataset(
+    #     inputs_test_tensor, labels_test_tensor)
+    # testing_dataset = torch.utils.data.DataLoader(
+    #     testing, batch_size=64, shuffle=False)
     print("Testing...")
     accuracy = test(model, testing_dataset, max_len)
     print("Testing done!")
