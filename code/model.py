@@ -133,6 +133,8 @@ if __name__ == "__main__":
     dataset = torch.utils.data.DataLoader(data, batch_size=64, shuffle=True)
     inputs_test_tensor = torch.LongTensor(inputs_test)
     labels_test_tensor = torch.Tensor(labels_test)
+    print("inputs_test_tensor", inputs_test_tensor.shape)
+    print("labels_test_tensor", labels_test_tensor.shape)
     testing = torch.utils.data.TensorDataset(
         inputs_test_tensor, labels_test_tensor)
     testing_dataset = torch.utils.data.DataLoader(
