@@ -57,41 +57,32 @@ if __name__ == "__main__":
     print(training_tweets.shape)
     print(testing_tweets.shape)
 
-    single_uses = set()
-
     for tweet in training_tweets:
         tweet = tokenize(tweet)
         for word in tweet:
             if word not in vocab:
-                vocab[word] = index
-                index += 1
-                single_uses.add(word)
+                vocab[word] = 1
             else:
-                if word in single_uses:
-                    single_uses.remove(word)
+                vocab[word] += 1
+                
 
     for tweet in testing_tweets:
         tweet = tokenize(tweet)
         for word in tweet:
             if word not in vocab:
-                vocab[word] = index
-                index += 1
-                single_uses.add(word)
+                vocab[word] = 1
             else:
-                if word in single_uses:
-                    single_uses.remove(word)
-
-    print(len(vocab))
-
-    for word in single_uses:
-        del vocab[word]
-
-    print(len(vocab))
+                vocab[word] += 1
 
     index = 0
+    vocab_true = {}
     for word in vocab:
-        vocab[word] = index
-        index += 1
+        if vocab[word] > 2:
+            vocab_true[word] = index
+            index += 1
+    
+
+    print(len(vocab))
 
     with open("data/vocab.pkl", 'wb') as f:
         pickle.dump(vocab, f)

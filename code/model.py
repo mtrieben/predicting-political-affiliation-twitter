@@ -63,9 +63,9 @@ def train(model, dataset, max_len):
             count += 1
             if count % 10 == 0:
                 print("count:", count)
-                gc.collect()
-                print('maxrss = {}'.format(
-                    resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6))
+                # gc.collect()
+                # print('maxrss = {}'.format(
+                #     resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6))
                 # print("loss", loss.item())
 
 
