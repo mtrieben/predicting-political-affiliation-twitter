@@ -42,11 +42,11 @@ def generate_glove_weights(vocab):
 
 if __name__ == "__main__":
     vocab = {
-        "<PAD>": 0,
-        "<UNK>": 1,
-        "<LINK>": 2,
+        "<PAD>": 1000,
+        "<UNK>": 1000,
+        "<LINK>": 1000,
         # "<HASHTAG>": 3,
-        "<MENTION>": 3
+        "<MENTION>": 1000
     }
 
     index = 4
@@ -64,7 +64,6 @@ if __name__ == "__main__":
                 vocab[word] = 1
             else:
                 vocab[word] += 1
-                
 
     for tweet in testing_tweets:
         tweet = tokenize(tweet)
@@ -74,13 +73,20 @@ if __name__ == "__main__":
             else:
                 vocab[word] += 1
 
+    print(len(vocab))
+
+    words_to_unk = set()
+
     index = 0
-    vocab_true = {}
     for word in vocab:
-        if vocab[word] > 2:
-            vocab_true[word] = index
+        if vocab[word] > 3:
+            vocab[word] = index
             index += 1
-    
+        else:
+            words_to_unk.add(word)
+
+    for word in words_to_unk:
+        del vocab[word]
 
     print(len(vocab))
 
