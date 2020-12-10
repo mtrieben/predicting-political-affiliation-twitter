@@ -7,14 +7,14 @@ import numpy as np
 from torch.autograd import Variable
 from preprocessing.generate_vocab import tokenize
 from torch.utils.data import Dataset
-import gc
-import resource
+# import gc
+# import resource
 
 
 class Net(torch.nn.Module):
     def __init__(self, weights, maxlen):
         super(Net, self).__init__()
-        self.hidden_size = 128
+        self.hidden_size = 1024
         self.feature_size = 300
         self.keep_size = 0.67
         self.maxlen = maxlen
@@ -40,7 +40,7 @@ def train(model, dataset, max_len):
         model.parameters(), lr=1e-3, weight_decay=0.0436)
     criterion = torch.nn.BCEWithLogitsLoss()
 
-    for epoch in range(1):
+    for epoch in range(5):
         print("epoch", epoch)
         hidden = torch.zeros(2, max_len, model.hidden_size)
         count = 0
@@ -125,16 +125,20 @@ if __name__ == "__main__":
         "data/train/text.npy", "data/train/labels.npy", "data/test/text.npy", "data/test/labels.npy", vocab)
     glove = torch.Tensor(np.load("data/glove.npy", allow_pickle=True))
     #data = NlpDataset(inputs, labels)
-    inputs_tensor = torch.LongTensor(inputs_train[:30000])
-    labels_tensor = torch.Tensor(labels_train[:30000])
+    inputs_tensor = torch.LongTensor(inputs_train)
+    labels_tensor = torch.Tensor(labels_train)
+    print("inputs_tensor", inputs_tensor.shape)
+    print("labels_tensor", labels_tensor.shape)
     data = torch.utils.data.TensorDataset(inputs_tensor, labels_tensor)
-    dataset = torch.utils.data.DataLoader(data, batch_size=64, shuffle=True)
+    dataset = torch.utils.data.DataLoader(data, batch_size=1024, shuffle=True)
     inputs_test_tensor = torch.LongTensor(inputs_test)
     labels_test_tensor = torch.Tensor(labels_test)
+    print("inputs_test_tensor", inputs_test_tensor.shape)
+    print("labels_test_tensor", labels_test_tensor.shape)
     testing = torch.utils.data.TensorDataset(
         inputs_test_tensor, labels_test_tensor)
     testing_dataset = torch.utils.data.DataLoader(
-        testing, batch_size=64, shuffle=False)
+        testing, batch_size=1024, shuffle=False)
     model = Net(glove, max_len)
     accuracy = test(model, testing_dataset, max_len)
     print("accuracy 1:", accuracy)
