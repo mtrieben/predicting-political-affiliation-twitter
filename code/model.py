@@ -46,7 +46,7 @@ def train(model, dataset, max_len):
     criterion = torch.nn.BCELoss()
     model.train()
     # Train for # of epochs
-    for epoch in range(2):
+    for epoch in range(10):
         print("epoch", epoch)
         hidden = torch.zeros(2, max_len, model.hidden_size)
         count = 0
@@ -125,7 +125,6 @@ if __name__ == "__main__":
     inputs_train, inputs_test, labels_train, labels_test, max_len = prep_data(
         "data/train/text.npy", "data/train/labels.npy", "data/test/text.npy", "data/test/labels.npy", vocab)
     glove = torch.Tensor(np.load("data/glove.npy", allow_pickle=True))
-
     # Create DataLoader for training data
     inputs_tensor = torch.LongTensor(inputs_train)
     labels_tensor = torch.Tensor(labels_train)

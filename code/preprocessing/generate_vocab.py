@@ -60,6 +60,7 @@ if __name__ == "__main__":
     print(training_tweets.shape)
     print(testing_tweets.shape)
 
+    # Add training Tweets to vocab
     for tweet in training_tweets:
         tweet = tokenize(tweet)
         for word in tweet:
@@ -68,6 +69,7 @@ if __name__ == "__main__":
             else:
                 vocab[word] += 1
 
+    # Add testing Tweets to vocab
     for tweet in testing_tweets:
         tweet = tokenize(tweet)
         for word in tweet:
@@ -80,9 +82,10 @@ if __name__ == "__main__":
 
     words_to_unk = set()
 
+    # Remove words that appear fewer than 6 times
     index = 0
     for word in vocab:
-        if vocab[word] > 3:
+        if vocab[word] > 5:
             vocab[word] = index
             index += 1
         else:
