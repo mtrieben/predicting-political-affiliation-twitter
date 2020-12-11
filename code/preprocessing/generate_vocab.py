@@ -3,8 +3,10 @@ import numpy as np
 import pickle
 
 
+# Tokenizes a tweet
 def tokenize(text):
     words = text.split()
+    # For each word, replace with token if its a link or @
     for i in range(len(words)):
         w = words[i]
         if "http" in w:
@@ -14,11 +16,12 @@ def tokenize(text):
         elif w.startswith(".@"):
             words[i] = "<MENTION>"
         else:
+            # Remove punctuation
             words[i] = w.strip().strip(string.punctuation).strip(
                 '…’‘”“ ,.•——?​​​​"\'').lower()
     return words
 
-
+# Generate and save GLoVe embeddings for our vocabulary
 def generate_glove_weights(vocab):
     embeddings_index = {}
     with open("data/glove.6B.300d.txt") as f:
@@ -34,18 +37,18 @@ def generate_glove_weights(vocab):
             hits += 1
             embedding_matrix[i] = embeddings_index[word.lower()]
         else:
-            # print(word)
+            # If word does not have pretrained GLoVe embedding, randomly initialize an embedding for it
             embedding_matrix[i] = np.random.randn(1, 300)
     print("Word hit rate %f" % (hits/len(vocab)))
     return embedding_matrix
 
 
 if __name__ == "__main__":
+    # Initial vocab with token s
     vocab = {
         "<PAD>": 1000,
         "<UNK>": 1000,
         "<LINK>": 1000,
-        # "<HASHTAG>": 3,
         "<MENTION>": 1000
     }
 
